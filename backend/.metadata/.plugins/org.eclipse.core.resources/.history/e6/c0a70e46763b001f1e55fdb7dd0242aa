@@ -1,0 +1,18 @@
+package com.fullstack.dochub.service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.fullstack.dochub.Entity.Client;
+import com.fullstack.dochub.repository.ClientRepository;
+
+@Service
+public class ClientService {
+	
+	@Autowired
+	ClientRepository clientRepo;
+	
+	public Client addNewClient(Client client) {
+		return clientRepo.save(client);
+	}
+}

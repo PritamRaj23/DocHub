@@ -1,0 +1,16 @@
+package com.fullstack.dochub.service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.fullstack.dochub.Entity.Doctor;
+import com.fullstack.dochub.repository.DoctorRepository;
+
+public class DoctorService {
+
+	@Autowired
+	DoctorRepository doctorRepo;
+
+	public Doctor addNewClient(Doctor doctor) {
+		return doctorRepo.save(doctor);
+	}
+}

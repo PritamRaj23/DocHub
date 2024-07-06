@@ -1,0 +1,9 @@
+spring.application.name=online_doctors_clinic
+server.port=9999
+spring.datasource.url=jdbc:mysql://localhost:3306/dochub_fullstack
+spring.datasource.username=root
+spring.datasource.password=Nabankur@314
+
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL8Dialect

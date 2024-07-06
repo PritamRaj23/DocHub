@@ -1,0 +1,32 @@
+package com.fullstack.dochub.service;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.fullstack.dochub.Entity.Appointments;
+import com.fullstack.dochub.repository.AppointmentsRepository;
+
+@Service
+public class AppointmentsService {
+
+	@Autowired
+	AppointmentsRepository appRepo;
+	
+	//client's appointment list
+	public List<Appointments> getClientAppointments(String client_email){
+		List<Appointments> appointmentList = appRepo.findByClient_Email(client_email);
+		if(appointmentList == null)
+			throw new IllegalArgumentException("list did not found");
+		return appointmentList;
+	}
+	
+	//doctor's appointment list
+		public List<Appointments> getDoctorAppointments(String doctor_email){
+			List<Appointments> appointmentList = appRepo.findByDoctor_Email(doctor_email);
+			if(appointmentList == null)
+				throw new IllegalArgumentException("list did not found");
+			return appointmentList;
+		}
+}

@@ -1,0 +1,68 @@
+package com.fullstack.dochub.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.fullstack.dochub.Entity.Admin;
+import com.fullstack.dochub.Entity.Client;
+import com.fullstack.dochub.Entity.Doctor;
+import com.fullstack.dochub.service.AdminService;
+import com.fullstack.dochub.service.AppointmentsService;
+import com.fullstack.dochub.service.ClientService;
+import com.fullstack.dochub.service.DoctorService;
+
+import jakarta.servlet.http.HttpSession;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+@RestController
+@RequestMapping("/api")
+public class Controller {
+	@Autowired
+	AppointmentsService appointmentsService;
+
+	@Autowired
+	ClientService clientService;
+
+	@Autowired
+	DoctorService doctorService;
+
+	@Autowired
+	AdminService adminService;
+
+	// client registration
+	@PostMapping("/clientRegistration")
+	public Client clientRegistration(@RequestBody Client client, HttpSession session) {
+		if (client.getEmail() == null || client.getEmail().isEmpty()) {
+			throw new IllegalArgumentException("Email must be provided");
+		}
+		// Additional validation checks can be added here
+		clientService.addNewClient(client);
+		session.setAttribute("data", client);
+		return client;
+	}
+
+	// doctor registration
+	@PostMapping("/doctorRegistration")
+	public Doctor doctorRegistration(@RequestBody Doctor doctor, HttpSession session) {
+		if (doctor.getEmail() == null || doctor.getEmail().isEmpty()) {
+			throw new IllegalArgumentException("Email must be provided");
+		}
+		// Additional validation checks can be added here
+		doctorService.addNewDoctor(doctor);
+		session.setAttribute("data", doctor);
+		return doctor;
+	}
+
+	// admin login
+	@PostMapping("/adminLogin")
+	public Admin adminLogin(@RequestParam String email, @RequestParam String pass) {
+		if (email != null && pass != null)
+			return adminService.adminLogin(email, pass);
+		throw new IllegalArgumentException("invalid credentials");
+	}
+
+}

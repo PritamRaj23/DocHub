@@ -1,0 +1,5 @@
+package com.fullstack.dochub.Entity;
+
+public class Admin {
+
+}

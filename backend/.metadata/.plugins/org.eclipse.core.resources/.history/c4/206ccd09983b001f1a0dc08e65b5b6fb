@@ -1,0 +1,9 @@
+package com.fullstack.dochub.repository;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.fullstack.dochub.Entity.Appointments;
+
+public interface AppointmentsRepository extends JpaRepository<Appointments, Integer> {
+
+}

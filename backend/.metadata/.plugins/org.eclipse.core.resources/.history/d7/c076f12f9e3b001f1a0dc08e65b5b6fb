@@ -1,0 +1,129 @@
+package com.fullstack.dochub.controller;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.fullstack.dochub.Entity.Admin;
+import com.fullstack.dochub.Entity.Appointments;
+import com.fullstack.dochub.Entity.Client;
+import com.fullstack.dochub.Entity.Doctor;
+import com.fullstack.dochub.service.AdminService;
+import com.fullstack.dochub.service.AppointmentsService;
+import com.fullstack.dochub.service.ClientService;
+import com.fullstack.dochub.service.DoctorService;
+
+import jakarta.servlet.http.HttpSession;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+
+@RestController
+@RequestMapping("/api")
+public class Controller {
+    @Autowired
+    AppointmentsService appointmentsService;
+
+    @Autowired
+    ClientService clientService;
+
+    @Autowired
+    DoctorService doctorService;
+
+    @Autowired
+    AdminService adminService;
+
+    // client registration
+    @PostMapping("/clientRegistration")
+    public Client clientRegistration(@RequestBody Client client, HttpSession session) {
+        if (client.getEmail() == null || client.getEmail().isEmpty()) {
+            throw new IllegalArgumentException("Email must be provided");
+        }
+        // Additional validation checks can be added here
+        clientService.addNewClient(client);
+        session.setAttribute("data", client);
+        return client;
+    }
+
+    // client log in
+    @PostMapping("/clientLogin")
+    public Client clientLogin(@RequestBody Client client) {
+        if (client.getPassword() == null || client.getEmail() == null)
+            throw new IllegalArgumentException("Invalid credentials");
+        return clientService.clientLogin(client.getEmail(), client.getPassword());
+    }
+
+    // doctor registration
+    @PostMapping("/doctorRegistration")
+    public Doctor doctorRegistration(@RequestBody Doctor doctor, HttpSession session) {
+        if (doctor.getEmail() == null || doctor.getEmail().isEmpty()) {
+            throw new IllegalArgumentException("Email must be provided");
+        }
+        // Additional validation checks can be added here
+        doctorService.addNewDoctor(doctor);
+        session.setAttribute("data", doctor);
+        return doctor;
+    }
+
+    // doctor log in
+    @PostMapping("/doctorLogin")
+    public Doctor doctorLogin(@RequestBody Doctor doctor) {
+        if (doctor.getPassword() == null || doctor.getEmail() == null)
+            throw new IllegalArgumentException("Invalid credentials");
+        return doctorService.doctorLogin(doctor.getEmail(), doctor.getPassword());
+    }
+
+    // admin login
+    @PostMapping("/adminLogin")
+    public Admin adminLogin(@RequestBody Admin admin) {
+        if (admin.getPassword() == null || admin.getEmail() == null)
+            throw new IllegalArgumentException("Invalid credentials");
+        return adminService.adminLogin(admin.getEmail(), admin.getPassword());
+    }
+
+    // client's appointment list
+    @GetMapping("/client/appointments/{client_email}")
+    public List<Appointments> getClientAppointments(@PathVariable String client_email) {
+        List<Appointments> appointmentList = appointmentsService.getClientAppointments(client_email);
+        if (appointmentList == null || appointmentList.isEmpty())
+            throw new IllegalArgumentException("No appointments found for the client");
+        return appointmentList;
+    }
+
+    // doctor's appointment list
+    @GetMapping("/doctor/appointments/{doctor_email}")
+    public List<Appointments> getDoctorAppointments(@PathVariable String doctor_email) {
+        List<Appointments> appointmentList = appointmentsService.getDoctorAppointments(doctor_email);
+        if (appointmentList == null || appointmentList.isEmpty())
+            throw new IllegalArgumentException("No appointments found for the doctor");
+        return appointmentList;
+    }
+    //book appointmensts
+    @PostMapping("/client/bookAppointments/{client_email}/{doctor_email}")
+    public Appointments bookAppointments(@RequestBody Appointments appointments,
+                                          @PathVariable String client_email,
+                                          @PathVariable String doctor_email) {
+        // Find the client by email
+        Client client = clientService.findClientByEmail(client_email);
+        if (client == null) {
+            throw new IllegalArgumentException("Client not found with email: " + client_email);
+        }
+        
+        // Find the doctor by email
+        Doctor doctor = doctorService.findDoctorByEmail(doctor_email);
+        if (doctor == null) {
+            throw new IllegalArgumentException("Doctor not found with email: " + doctor_email);
+        }
+
+        // Set the client and doctor in the appointment
+        appointments.setClient(client);
+        appointments.setDoctor(doctor);
+
+        // Save the appointment
+        return appointmentsService.saveAppointment(appointments);
+    }
+
+}

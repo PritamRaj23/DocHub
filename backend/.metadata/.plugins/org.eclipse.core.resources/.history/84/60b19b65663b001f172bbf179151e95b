@@ -1,0 +1,5 @@
+package com.fullstack.dochub.service;
+
+public class ClientService {
+
+}

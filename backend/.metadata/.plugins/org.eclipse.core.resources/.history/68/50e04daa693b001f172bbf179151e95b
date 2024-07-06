@@ -1,0 +1,30 @@
+package com.fullstack.dochub.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.fullstack.dochub.Entity.Client;
+import com.fullstack.dochub.service.AppointmentsService;
+import com.fullstack.dochub.service.ClientService;
+
+@RestController
+public class Controller {
+	@Autowired
+	AppointmentsService appointmentsService;
+	@Autowired
+	ClientService clientService;
+
+	// client registration
+	@PostMapping("/clientRegistration")
+	public Client clientRegistration(@RequestBody Client client) {
+		if (client.getEmail() == null || client.getEmail().isEmpty()) {
+			throw new IllegalArgumentException("Email must be provided");
+		}
+		// Additional validation checks can be added here
+
+		return clientService.addNewClient(client);
+	}
+
+}
