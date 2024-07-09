@@ -1,4 +1,4 @@
-package com.fullstack.dochub.Entity;
+package com.fullstack.dochub.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -7,27 +7,33 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "appointments")
 public class Appointments {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private int id;
 
-    private String date;
-    private String time;
-    private String description;
-    private String status;
+	private String date;
+	private String time;
+	private String description;
+	private String status;
 
-    @ManyToOne
-    @JoinColumn(name = "client_email", nullable = false)
-    private Client client;
+	@ManyToOne
+	@JoinColumn(name = "client_email", nullable = false)
+	private Client client;
 
-    @ManyToOne
-    @JoinColumn(name = "doctor_email", nullable = false)
-    private Doctor doctor;
+	@ManyToOne
+	@JoinColumn(name = "doctor_email", nullable = false)
+	private Doctor doctor;
 
 	public int getId() {
 		return id;
@@ -84,6 +90,4 @@ public class Appointments {
 	public void setDoctor(Doctor doctor) {
 		this.doctor = doctor;
 	}
-    
-    
 }

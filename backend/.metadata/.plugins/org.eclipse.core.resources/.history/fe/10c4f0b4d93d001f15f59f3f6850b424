@@ -1,0 +1,12 @@
+package com.fullstack.dochub.repository;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.fullstack.dochub.Entity.Admin;
+//import java.util.List;
+
+
+public interface AdminRepository extends JpaRepository<Admin, String> {
+	
+	Admin findByEmailAndPassword(String email, String password);
+}

@@ -1,0 +1,55 @@
+package com.fullstack.dochub.service;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.fullstack.dochub.Entity.Appointments;
+import com.fullstack.dochub.Entity.Client;
+import com.fullstack.dochub.Entity.Doctor;
+import com.fullstack.dochub.repository.AppointmentsRepository;
+import com.fullstack.dochub.repository.ClientRepository;
+import com.fullstack.dochub.repository.DoctorRepository;
+
+@Service
+public class AppointmentsService {
+
+	@Autowired
+	AppointmentsRepository appRepo;
+
+	@Autowired
+	private ClientRepository clientRepository;
+
+	@Autowired
+	private DoctorRepository doctorRepository;
+
+	public Appointments bookAppointment(String clientEmail, String doctorEmail, Appointments appointment) {
+		Client client = clientRepository.findById(clientEmail)
+				.orElseThrow(() -> new RuntimeException("Client not found"));
+		Doctor doctor = doctorRepository.findById(doctorEmail)
+				.orElseThrow(() -> new RuntimeException("Doctor not found"));
+
+		appointment.setClient(client);
+		appointment.setDoctor(doctor);
+
+		return appRepo.save(appointment);
+	}
+
+	// client's appointment list
+	public List<Appointments> getClientAppointments(String client_email) {
+		List<Appointments> appointmentList = appRepo.findByClient_Email(client_email);
+		if (appointmentList == null)
+			throw new IllegalArgumentException("list did not found");
+		return appointmentList;
+	}
+
+	// doctor's appointment list
+	public List<Appointments> getDoctorAppointments(String doctor_email) {
+		List<Appointments> appointmentList = appRepo.findByDoctor_EmailOrderByDateTimeListAppointments(doctor_email);
+		if (appointmentList == null)
+			throw new IllegalArgumentException("list did not found");
+		return appointmentList;
+	}
+
+}

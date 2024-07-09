@@ -1,0 +1,38 @@
+package com.fullstack.dochub.service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import com.fullstack.dochub.entity.Doctor;
+import com.fullstack.dochub.repository.DoctorRepository;
+
+@Service
+public class DoctorService {
+
+    @Autowired
+    private DoctorRepository doctorRepo;
+
+    public Doctor addNewDoctor(Doctor doctor) {
+        if (doctor == null || doctor.getEmail() == null || doctor.getEmail().isEmpty()) {
+            throw new IllegalArgumentException("Doctor information is missing or incomplete.");
+        }
+        return doctorRepo.save(doctor);
+    }
+
+    public Doctor doctorLogin(String email, String password) {
+        if (email == null || email.isEmpty() || password == null || password.isEmpty()) {
+            throw new IllegalArgumentException("Email or password is missing.");
+        }
+        Doctor doctor = doctorRepo.findByEmailAndPassword(email, password);
+        if (doctor == null) {
+            throw new IllegalArgumentException("Invalid credentials.");
+        }
+        return doctor;
+    }
+
+    public Doctor findByEmail(String email) {
+        if (email == null || email.isEmpty()) {
+            throw new IllegalArgumentException("Email is missing.");
+        }
+        return doctorRepo.findById(email).orElse(null);
+    }
+}

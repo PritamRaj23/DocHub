@@ -1,0 +1,155 @@
+package com.fullstack.dochub.controller;
+
+import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import com.fullstack.dochub.entity.Admin;
+import com.fullstack.dochub.entity.Appointments;
+import com.fullstack.dochub.entity.Client;
+import com.fullstack.dochub.entity.Doctor;
+import com.fullstack.dochub.service.AdminService;
+import com.fullstack.dochub.service.AppointmentsService;
+import com.fullstack.dochub.service.ClientService;
+import com.fullstack.dochub.service.DoctorService;
+
+import jakarta.servlet.http.HttpSession;
+
+@CrossOrigin
+@RestController
+@RequestMapping("/api")
+public class Controller {
+
+    @Autowired
+    private AppointmentsService appointmentsService;
+
+    @Autowired
+    private ClientService clientService;
+
+    @Autowired
+    private DoctorService doctorService;
+
+    @Autowired
+    private AdminService adminService;
+
+    @PostMapping("/clientRegistration")
+    public ResponseEntity<Client> clientRegistration(@RequestBody Client client, HttpSession session) {
+        if (client.getEmail() == null || client.getEmail().isEmpty()) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        Client newClient = clientService.addNewClient(client);
+        session.setAttribute("data", newClient);
+        return ResponseEntity.status(HttpStatus.CREATED).body(newClient);
+    }
+
+    @PostMapping("/clientLogin")
+    public ResponseEntity<Client> clientLogin(@RequestBody Client client) {
+        if (client.getPassword() == null || client.getEmail() == null) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        Client loggedInClient = clientService.clientLogin(client.getEmail(), client.getPassword());
+        if (loggedInClient == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+        return ResponseEntity.ok(loggedInClient);
+    }
+
+    @PostMapping("/doctorRegistration")
+    public ResponseEntity<Doctor> doctorRegistration(@RequestBody Doctor doctor, HttpSession session) {
+        if (doctor.getEmail() == null || doctor.getEmail().isEmpty()) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        Doctor newDoctor = doctorService.addNewDoctor(doctor);
+        session.setAttribute("data", newDoctor);
+        return ResponseEntity.status(HttpStatus.CREATED).body(newDoctor);
+    }
+
+    @PostMapping("/doctorLogin")
+    public ResponseEntity<Doctor> doctorLogin(@RequestBody Doctor doctor) {
+        if (doctor.getPassword() == null || doctor.getEmail() == null) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        Doctor loggedInDoctor = doctorService.doctorLogin(doctor.getEmail(), doctor.getPassword());
+        if (loggedInDoctor == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+        return ResponseEntity.ok(loggedInDoctor);
+    }
+
+    @PostMapping("/adminLogin")
+    public ResponseEntity<Admin> adminLogin(@RequestBody Admin admin) {
+        if (admin.getPassword() == null || admin.getEmail() == null) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        Admin loggedInAdmin = adminService.adminLogin(admin.getEmail(), admin.getPassword());
+        if (loggedInAdmin == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+        return ResponseEntity.ok(loggedInAdmin);
+    }
+
+    @PostMapping("/client/bookAppointments/{clientEmail}/{doctorEmail}")
+    public ResponseEntity<Appointments> bookAppointment(@PathVariable String clientEmail,
+                                                        @PathVariable String doctorEmail,
+                                                        @RequestBody Appointments appointment) {
+        try {
+            if (clientEmail == null || doctorEmail == null || appointment == null) {
+                throw new IllegalArgumentException("Invalid input data.");
+            }
+            Appointments bookedAppointment = appointmentsService.bookAppointment(clientEmail, doctorEmail, appointment);
+            return ResponseEntity.status(HttpStatus.CREATED).body(bookedAppointment);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+    }
+
+    @GetMapping("/client/appointments/{clientEmail}")
+    public ResponseEntity<List<Appointments>> getClientAppointments(@PathVariable String clientEmail) {
+        try {
+            if (clientEmail == null || clientEmail.isEmpty()) {
+                throw new IllegalArgumentException("Client email is missing.");
+            }
+            List<Appointments> appointmentList = appointmentsService.getClientAppointments(clientEmail);
+            return ResponseEntity.ok(appointmentList);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+    }
+
+    @GetMapping("/doctor/appointments/{doctorEmail}")
+    public ResponseEntity<List<Appointments>> getDoctorAppointments(@PathVariable String doctorEmail) {
+        try {
+            if (doctorEmail == null || doctorEmail.isEmpty()) {
+                throw new IllegalArgumentException("Doctor email is missing.");
+            }
+            List<Appointments> appointmentList = appointmentsService.getDoctorAppointments(doctorEmail);
+            return ResponseEntity.ok(appointmentList);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+    }
+
+    @PutMapping("/doctor/editAppointmentStatus")
+    public ResponseEntity<Appointments> updateAppointmentStatus(@RequestBody Appointments appointment) {
+        try {
+            if (appointment == null || appointment.getId() == null) {
+                throw new IllegalArgumentException("Appointment or ID is missing.");
+            }
+            Appointments updatedAppointment = appointmentsService.updateAppointmentStatus(appointment);
+            return ResponseEntity.ok(updatedAppointment);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+    }
+
+    @GetMapping("/admin/getClient")
+    public ResponseEntity<List<Client>> getAllClient() {
+        List<Client> clientList = adminService.getAllClient();
+        if (clientList == null || clientList.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+        }
+        return ResponseEntity.ok(clientList);
+    }
+}

@@ -1,9 +1,15 @@
-package com.fullstack.dochub.Entity;
+package com.fullstack.dochub.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "doctor")
 public class Doctor {
@@ -81,5 +87,4 @@ public class Doctor {
 	public void setAddress(String address) {
 		this.address = address;
 	}
-
 }
